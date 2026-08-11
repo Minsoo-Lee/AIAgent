@@ -1,0 +1,51 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.5'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'roadmap'
+version = '0.0.1-SNAPSHOT'
+description = 'aiAgent'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation platform("org.springframework.ai:spring-ai-bom:1.1.2")
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // Spring AI - Chat (Gemini OpenAI 호환)
+    implementation 'org.springframework.ai:spring-ai-starter-model-openai'
+
+    // Spring AI - Embedding (Gemini 전용)
+    implementation 'org.springframework.ai:spring-ai-starter-model-google-genai-embedding'
+
+    // Spring AI - pgvector
+    implementation 'org.springframework.ai:spring-ai-starter-vector-store-pgvector'
+
+    // Spring AI - Advisors
+    implementation 'org.springframework.ai:spring-ai-advisors-vector-store'
+
+    // JPA + PostgreSQL
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    runtimeOnly 'org.postgresql:postgresql'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
