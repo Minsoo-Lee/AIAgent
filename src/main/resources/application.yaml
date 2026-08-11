@@ -1,4 +1,5 @@
 server:
+  port: 8081
   servlet:
     encoding:
       charset: UTF-8
@@ -10,6 +11,8 @@ spring:
     exclude:
       - org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingAutoConfiguration
   ai:
+    tavily:
+      api-key: ${TAVILY_API_KEY}
     openai:
       api-key: ${GEMINI_API_KEY}
       base-url: https://generativelanguage.googleapis.com/v1beta/openai
@@ -33,14 +36,14 @@ spring:
         distance-type: COSINE_DISTANCE
 
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:5433/aiagent
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/springai
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: none
 
   application:
     name: aiAgent
