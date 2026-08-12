@@ -6,6 +6,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,6 +26,7 @@ public class AgentController {
     private final RagSearchTool ragSearchTool;
     private final GithubSearchTool githubSearchTool;
     private final ChatMemory chatMemory;
+    private final ToolCallbackProvider toolCallbackProvider;
 
     @GetMapping("/agent/v1")
     public String agentV1(@RequestParam String question) {
@@ -57,7 +59,7 @@ public class AgentController {
     }
 
     @GetMapping("/agent/v4")
-    public String agentV4(@RequestParam String question, @RequestParam String conversationId) {
+    public String agentV4(@RequestParam String question) {
         return chatClientBuilder.build()
                 .prompt()
                 .system("""
@@ -68,10 +70,6 @@ public class AgentController {
                         3. 두 가지 모두 필요하면 둘 다 사용
                         4. 반드시 한국어로 답변하세요.
                         """)
-                .advisors(
-                        MessageChatMemoryAdvisor.builder(chatMemory).build()
-                )
-                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
                 .user(question)
                 .tools(sampleTool, ragSearchTool, githubSearchTool)
                 .call()
@@ -97,6 +95,20 @@ public class AgentController {
                 .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
                 .user(question)
                 .tools(sampleTool, ragSearchTool, githubSearchTool)
+                .call()
+                .content();
+    }
+
+    @GetMapping("/agent/v6")
+    public String agentV6(@RequestParam String question) {
+        return chatClientBuilder.build()
+                .prompt()
+                .system("""
+                        당신은 Spring AI 학습 도우미입니다.
+                        반드시 한국어로 답변하세요.
+                        """)
+                .user(question)
+                .toolCallbacks(toolCallbackProvider)
                 .call()
                 .content();
     }

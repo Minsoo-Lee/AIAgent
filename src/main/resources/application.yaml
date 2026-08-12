@@ -7,22 +7,22 @@ server:
       force: true
 
 spring:
-  autoconfigure:
-    exclude:
-      - org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingAutoConfiguration
   ai:
-    tavily:
-      api-key: ${TAVILY_API_KEY}
-    openai:
-      api-key: ${GEMINI_API_KEY}
-      base-url: https://generativelanguage.googleapis.com/v1beta/openai
-      chat:
-        base-url: https://generativelanguage.googleapis.com/v1beta/openai
-        completions-path: /chat/completions
-        options:
-          model: gemini-2.5-flash-lite
+    mcp:
+      client:
+        streamable-http:
+          connections:
+            tavily:
+              url: https://mcp.tavily.com/mcp/?tavilyApiKey=${TAVILY_API_KEY}
     google:
       genai:
+        project-id: ${GOOGLE_CLOUD_PROJECT_ID}
+        api-key: ${GEMINI_API_KEY}
+
+        chat:
+          options:
+            model: gemini-3.5-flash-lite
+
         embedding:
           api-key: ${GEMINI_API_KEY}
           text:
