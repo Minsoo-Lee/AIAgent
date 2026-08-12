@@ -1,22 +1,30 @@
 package roadmap.aiagent.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roadmap.aiagent.tool.GithubSearchTool;
 import roadmap.aiagent.tool.RagSearchTool;
 import roadmap.aiagent.tool.SampleTool;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
+@RequestMapping(produces = "application/json;charset=UTF-8")
 public class AgentController {
 
     private final ChatClient.Builder chatClientBuilder;
     private final SampleTool sampleTool;
     private final RagSearchTool ragSearchTool;
     private final GithubSearchTool githubSearchTool;
+    private final ChatMemory chatMemory;
 
     @GetMapping("/agent/v1")
     public String agentV1(@RequestParam String question) {
@@ -49,17 +57,44 @@ public class AgentController {
     }
 
     @GetMapping("/agent/v4")
-    public String agentV4(@RequestParam String question) {
+    public String agentV4(@RequestParam String question, @RequestParam String conversationId) {
         return chatClientBuilder.build()
                 .prompt()
                 .system("""
-                    당신은 Spring AI 학습 도우미입니다.
-                    다음 규칙을 따르세요:
-                    1. Spring AI 개념이나 기능에 대한 질문 → searchDocument Tool 사용
-                    2. 예제 코드나 구현 방법에 대한 질문 → searchGithub Tool 사용
-                    3. 두 가지 모두 필요하면 둘 다 사용
-                    4. 반드시 한국어로 답변하세요.
-                    """)
+                        당신은 Spring AI 학습 도우미입니다.
+                        다음 규칙을 따르세요:
+                        1. Spring AI 개념이나 기능에 대한 질문 → searchDocument Tool 사용
+                        2. 예제 코드나 구현 방법에 대한 질문 → searchGithub Tool 사용
+                        3. 두 가지 모두 필요하면 둘 다 사용
+                        4. 반드시 한국어로 답변하세요.
+                        """)
+                .advisors(
+                        MessageChatMemoryAdvisor.builder(chatMemory).build()
+                )
+                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
+                .user(question)
+                .tools(sampleTool, ragSearchTool, githubSearchTool)
+                .call()
+                .content();
+    }
+
+    @GetMapping("/agent/v5")
+    public String agentV5(@RequestParam String question,
+                          @RequestParam String conversationId) {
+        return chatClientBuilder.build()
+                .prompt()
+                .system("""
+                        당신은 Spring AI 학습 도우미입니다.
+                        다음 규칙을 따르세요:
+                        1. Spring AI 개념이나 기능에 대한 질문 -> searchDocument Tool 사용
+                        2. 예제 코드나 구현 방법에 대한 질문 -> searchGithubTool 사용
+                        3. 두 가지 모두 필요하면 둘 다 사용
+                        4. 반드시 한국어로 답변하세요
+                        """)
+                .advisors(
+                        MessageChatMemoryAdvisor.builder(chatMemory).build()
+                )
+                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
                 .user(question)
                 .tools(sampleTool, ragSearchTool, githubSearchTool)
                 .call()
