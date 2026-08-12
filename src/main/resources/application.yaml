@@ -1,34 +1,31 @@
 server:
   port: 8081
-  servlet:
-    encoding:
-      charset: UTF-8
-      enabled: true
-      force: true
 
 spring:
   ai:
-    mcp:
-      client:
-        streamable-http:
-          connections:
-            tavily:
-              url: https://mcp.tavily.com/mcp/?tavilyApiKey=${TAVILY_API_KEY}
     google:
       genai:
-        project-id: ${GOOGLE_CLOUD_PROJECT_ID}
+#        project-id: ${GOOGLE_CLOUD_PROJECT_ID}
         api-key: ${GEMINI_API_KEY}
-
         chat:
           options:
             model: gemini-3.5-flash-lite
-
         embedding:
           api-key: ${GEMINI_API_KEY}
           text:
             options:
               model: gemini-embedding-001
               dimensions: 768
+    mcp:
+      client:
+        streamable-http:
+          connections:
+            tavily:
+              url: https://mcp.tavily.com
+              endpoint: /mcp/?tavilyApiKey=${TAVILY_API_KEY}
+        toolcallback:
+          enabled: true
+        initialized: false
     vectorstore:
       pgvector:
         initialize-schema: true
@@ -44,6 +41,3 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
-
-  application:
-    name: aiAgent

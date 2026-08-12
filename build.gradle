@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.4.5'
+    id 'org.springframework.boot' version '4.0.0'
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
@@ -19,32 +19,35 @@ repositories {
 }
 
 dependencies {
-    implementation platform("org.springframework.ai:spring-ai-bom:1.1.2")
+    implementation platform("org.springframework.ai:spring-ai-bom:2.0.0")
 
+    // Spring Boot
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
-    // Spring AI - Chat (Gemini OpenAI 호환)
+    // Spring AI - Google GenAI Chat
     implementation 'org.springframework.ai:spring-ai-starter-model-google-genai'
 
-    // Spring AI - Embedding (Gemini 전용)
+    // Spring AI - Google GenAI Embedding
     implementation 'org.springframework.ai:spring-ai-starter-model-google-genai-embedding'
 
-    // Spring AI - pgvector
+    // Spring AI - PGVector
     implementation 'org.springframework.ai:spring-ai-starter-vector-store-pgvector'
 
-    // Spring AI - Advisors
-    implementation 'org.springframework.ai:spring-ai-advisors-vector-store'
+    // Spring AI - Vector Store Advisor
+    implementation 'org.springframework.ai:spring-ai-vector-store-advisor'
+
+    // Spring AI - MCP Client
+    implementation 'org.springframework.ai:spring-ai-starter-mcp-client'
 
     // JPA + PostgreSQL
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     runtimeOnly 'org.postgresql:postgresql'
 
-    // MCP 클라이언트
-    implementation 'org.springframework.ai:spring-ai-starter-mcp-client'
-
+    // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
+    // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
