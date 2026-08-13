@@ -23,12 +23,17 @@ public class RagSearchTool {
                 SearchRequest.builder()
                         .query(query)
                         .topK(3)
-                        .similarityThreshold(0.5)
+                        .similarityThreshold(0.4)
                         .build()
         );
         log.info("🔍 RAG 검색 결과: {}개", results.size());
+
+        if (results.isEmpty()) {
+            return "관련 문서를 찾을 수 없습니다.";
+        }
+
         return results.stream()
-                .map(doc -> doc.getText())
+                .map(Document::getText)
                 .reduce("", (a, b) -> a + "\n\n" + b);
     }
 }

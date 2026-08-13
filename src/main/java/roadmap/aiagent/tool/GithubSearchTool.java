@@ -9,6 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 @Slf4j
 @Component
 public class GithubSearchTool {
@@ -23,8 +26,9 @@ public class GithubSearchTool {
 
         HttpEntity<Void> request = new HttpEntity<>(headers);
 
+        String encodedQuery = URLEncoder.encode(query + " spring-ai", StandardCharsets.UTF_8);
         String url = "https://api.github.com/search/repositories?q="
-                + query + "+spring-ai&sort=stars&order=desc&per_page=3";
+                + encodedQuery + "&sort=stars&order=desc&per_page=3";
 
         ResponseEntity<String> response = restTemplate.exchange(
                 url, HttpMethod.GET, request, String.class);

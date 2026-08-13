@@ -18,6 +18,14 @@ spring:
               dimensions: 768
     mcp:
       client:
+        stdio:
+          connections:
+            filesystem:
+              command: npx
+              args:
+                - -y
+                - "@modelcontextprotocol/server-filesystem"
+                - "/tmp"
         streamable-http:
           connections:
             tavily:
@@ -41,3 +49,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+
+logging:
+  level:
+    org.springframework.ai: DEBUG
+    com.google.genai: DEBUG

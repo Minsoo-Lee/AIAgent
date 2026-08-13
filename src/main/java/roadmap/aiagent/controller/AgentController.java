@@ -55,12 +55,14 @@ public class AgentController {
 
     @GetMapping("/agent/v3")
     public String agentV3(@RequestParam String question) {
-        return chatClientBuilder.build()
+        var chatResponse = chatClientBuilder.build()
                 .prompt()
                 .user(question)
                 .tools(sampleTool, ragSearchTool, githubSearchTool)
                 .call()
-                .content();
+                .chatResponse();
+        log.info("=== chatResponse: {} ===", chatResponse);
+        return chatResponse.getResult().getOutput().getText();
     }
 
     @GetMapping("/agent/v4")
@@ -106,6 +108,11 @@ public class AgentController {
 
     @GetMapping("/agent/v6")
     public String agentV6(@RequestParam String question) {
+        List<ToolCallback> sanitizedTools = Arrays.stream(toolCallbackProvider.getToolCallbacks())
+                .map(SanitizedToolCallBack::new)
+                .map(t -> (ToolCallback) t)
+                .toList();
+
         return chatClientBuilder.build()
                 .prompt()
                 .system("""
@@ -113,7 +120,7 @@ public class AgentController {
                         반드시 한국어로 답변하세요.
                         """)
                 .user(question)
-                .tools(toolCallbackProvider)
+                .tools(sanitizedTools)
                 .call()
                 .content();
     }
