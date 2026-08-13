@@ -31,6 +31,8 @@ spring:
             tavily:
               url: https://mcp.tavily.com
               endpoint: /mcp/?tavilyApiKey=${TAVILY_API_KEY}
+            github:
+              url: https://api.githubcopilot.com/mcp/
         toolcallback:
           enabled: true
         initialized: false
@@ -54,3 +56,6 @@ logging:
   level:
     org.springframework.ai: DEBUG
     com.google.genai: DEBUG
+
+github:
+  tokne: ${GITHUB_TOKEN}

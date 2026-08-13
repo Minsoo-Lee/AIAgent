@@ -21,6 +21,8 @@ repositories {
 dependencies {
     implementation platform("org.springframework.ai:spring-ai-bom:2.0.0")
 
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
     // Spring Boot
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
@@ -37,7 +39,8 @@ dependencies {
     implementation 'org.springframework.ai:spring-ai-vector-store-advisor'
 
     // Spring AI - MCP Client
-    implementation 'org.springframework.ai:spring-ai-starter-mcp-client'
+//    implementation 'org.springframework.ai:spring-ai-starter-mcp-client'
+    implementation 'org.springframework.ai:spring-ai-starter-mcp-client-webflux'
 
     // JPA + PostgreSQL
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'

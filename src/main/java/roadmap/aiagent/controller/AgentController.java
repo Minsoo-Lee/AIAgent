@@ -149,4 +149,28 @@ public class AgentController {
                 .call()
                 .content();
     }
+
+    @GetMapping("/agent/v8")
+    public String agentV8(@RequestParam String question) {
+        List<ToolCallback> sanitizedTools = Arrays.stream(toolCallbackProvider.getToolCallbacks())
+                .map(SanitizedToolCallBack::new)
+                .map(t -> (ToolCallback) t)
+                .toList();
+
+        return chatClientBuilder.build()
+                .prompt()
+                .system("""
+                        당신은 Spring AI 학습 도우미입니다.
+                        다음 규칙을 따르세요:
+                        1. Spring AI 개념이나 기능에 대한 질문 → searchDocument Tool 사용
+                        2. 예제 코드나 구현 방법에 대한 질문 → GitHub 검색 Tool 사용
+                        3. 최신 정보나 실시간 정보가 필요한 질문 → Tavily 웹 검색 Tool 사용
+                        4. 반드시 한국어로 답변하세요.
+                        """)
+                .user(question)
+                .tools(sampleTool, ragSearchTool)
+                .tools(sanitizedTools)
+                .call()
+                .content();
+    }
 }
