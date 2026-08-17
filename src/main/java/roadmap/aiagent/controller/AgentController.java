@@ -7,6 +7,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.ToolCallingAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -131,9 +132,9 @@ public class AgentController {
     public String agentV7(@RequestParam String question) {
         List<ToolCallback> sanitizedTools =
                 Arrays.stream(toolCallbackProvider.getToolCallbacks())
-                .map(SanitizedToolCallBack::new)
-                .map(t -> (ToolCallback) t)
-                .toList();
+                        .map(SanitizedToolCallBack::new)
+                        .map(t -> (ToolCallback) t)
+                        .toList();
 
         return chatClientBuilder.build()
                 .prompt()
@@ -213,5 +214,55 @@ public class AgentController {
                 .tools(sanitizedTools)
                 .call()
                 .content();
+    }
+
+    @GetMapping("/agent/v10")
+    public String agentV10(@RequestParam String question) {
+        List<ToolCallback> sanitizedTools = Arrays.stream(toolCallbackProvider.getToolCallbacks())
+                .map(SanitizedToolCallBack::new)
+                .map(t -> (ToolCallback) t)
+                .toList();
+
+        AtomicInteger iterationCount = new AtomicInteger(0);
+        int maxIterations = 5;
+
+        ToolCallingAdvisor toolCallingAdvisor = ToolCallingAdvisor.builder()
+                .toolExecutionEligibilityChecker(response -> {
+                    Boolean hasToolCalls = response != null && response.hasToolCalls();
+
+                    if (hasToolCalls) {
+                        int currentIteration = iterationCount.incrementAndGet();
+                        List<String> toolNames = response.getResult().getOutput().getToolCalls().stream()
+                                .map(AssistantMessage.ToolCall::name)
+                                .toList();
+
+                        log.info("🔄 [반복 {}] 호출된 Tool: {}", currentIteration, toolNames);
+
+                        if (currentIteration > maxIterations) {
+                            log.warn("⚠️ 최대 반복 횟수({}) 초과, 루프 중단", maxIterations);
+                            return false;
+                        }
+                    }
+                    return hasToolCalls;
+                })
+                .build();
+
+        return chatClientBuilder.build()
+                .prompt()
+                .system("""
+                    당신은 Spring AI 학습 도우미입니다.
+                    다음 규칙을 따르세요:
+                    1. Spring AI 개념이나 기능에 대한 질문 → searchDocument Tool 사용
+                    2. 예제 코드나 구현 방법에 대한 질문 → GitHub 검색 Tool 사용
+                    3. 최신 정보나 실시간 정보가 필요한 질문 → Tavily 웹 검색 Tool 사용
+                    4. 반드시 한국어로 답변하세요.
+                    """)
+                .advisors(toolCallingAdvisor)
+                .user(question)
+                .tools(sampleTool, ragSearchTool)
+                .tools(sanitizedTools)
+                .call()
+                .content();
+
     }
 }
