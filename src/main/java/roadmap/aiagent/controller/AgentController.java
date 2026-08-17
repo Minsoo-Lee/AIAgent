@@ -14,10 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import roadmap.aiagent.tool.GithubSearchTool;
-import roadmap.aiagent.tool.RagSearchTool;
-import roadmap.aiagent.tool.SampleTool;
-import roadmap.aiagent.tool.SanitizedToolCallBack;
+import roadmap.aiagent.tool.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,6 +32,8 @@ public class AgentController {
     private final GithubSearchTool githubSearchTool;
     private final ChatMemory chatMemory;
     private final ToolCallbackProvider toolCallbackProvider;
+    private final RagWorkerTool ragWorkerTool;
+    private final GithubWorkerTool githubWorkerTool;
 
     @GetMapping("/agent/v1")
     public String agentV1(@RequestParam String question) {
@@ -263,6 +262,22 @@ public class AgentController {
                 .tools(sanitizedTools)
                 .call()
                 .content();
+    }
 
+    @GetMapping("/agent/v11")
+    public String agentV11(@RequestParam String question) {
+        return chatClientBuilder.build()
+                .prompt()
+                .system("""
+                        당신은 Spring AI 학습 도우미의 Orchestrator(관리자)입니다.
+                        직접 답변하지 말고, 반드시 아래 Worker에게 작업을 위임하세요:
+                        1. Spring AI 문서/개념 관련 하위 작업 → askRagWorker Tool 사용
+                        2. GitHub 예제 코드 관련 하위 작업 → askGithubWorker Tool 사용
+                        각 Worker의 응답을 받으면, 이를 종합해서 최종 답변을 한국어로 작성하세요.
+                        """)
+                .user(question)
+                .tools(ragWorkerTool, githubWorkerTool)
+                .call()
+                .content();
     }
 }
