@@ -1,0 +1,19 @@
+info:
+  name: JWT 토큰 없이 테스트
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: http://localhost:8081/agent/v1?question=3 더하기 5는?
+  params:
+    - name: question
+      value: 3 더하기 5는?
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

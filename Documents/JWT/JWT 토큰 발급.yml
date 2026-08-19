@@ -1,0 +1,22 @@
+info:
+  name: JWT 토큰 발급
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: http://localhost:8081/auth/login
+  body:
+    type: json
+    data: |-
+      {
+        "username": "user",
+        "password": "password"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

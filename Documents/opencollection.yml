@@ -1,0 +1,26 @@
+opencollection: 1.0.0
+
+info:
+  name: AiAgent
+config:
+  proxy:
+    inherit: true
+    config:
+      protocol: http
+      hostname: ""
+      port: ""
+      auth:
+        username: ""
+        password: ""
+      bypassProxy: ""
+
+request:
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwiaWF0IjoxNzg3MTEwNDQ4LCJleHAiOjY4MzIzOTAxMjI0NDgzODd9.wfrZ7ryp2eHDgLRVrWn8YXQUxPy3v9GAnRueK-t1Mjo
+bundled: false
+extensions:
+  bruno:
+    ignore:
+      - node_modules
+      - .git

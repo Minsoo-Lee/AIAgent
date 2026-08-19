@@ -58,4 +58,8 @@ logging:
     com.google.genai: DEBUG
 
 github:
-  tokne: ${GITHUB_TOKEN}
+  token: ${GITHUB_TOKEN}
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 86400000  # 24시간
