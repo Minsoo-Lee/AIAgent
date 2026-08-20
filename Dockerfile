@@ -6,6 +6,7 @@ RUN gradle build -x test --no-daemon
 
 # 2단계: 실행
 FROM eclipse-temurin:21-jre-alpine
+RUN apk add --no-cache nodejs npm
 WORKDIR /app
 COPY --from=builder /app/build/libs/*.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
